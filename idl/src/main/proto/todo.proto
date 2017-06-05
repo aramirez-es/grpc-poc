@@ -9,9 +9,9 @@ message PanelRequest {
 }
 
 message PanelResponse {
-    string name = 1;
+    int32 index = 1;
 }
 
 service PanelResource {
-    rpc Panel (PanelRequest) returns (PanelResponse) {}
+    rpc AddPanel (PanelRequest) returns (PanelResponse) {}
 }

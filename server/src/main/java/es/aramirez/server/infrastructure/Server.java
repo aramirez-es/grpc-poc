@@ -1,5 +1,6 @@
-package es.aramirez.server;
+package es.aramirez.server.infrastructure;
 
+import es.aramirez.server.core.application.AddPanel;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ public class Server {
 
     final int port = 8000;
     io.grpc.Server server = ServerBuilder.forPort(port)
+        .addService(new AddPanel())
         .build()
         .start();
 
