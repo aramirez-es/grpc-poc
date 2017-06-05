@@ -1,4 +1,4 @@
-## GRPC Test
+## GRPC Proof of Concept
 
 1. Gradle Multi project with following sub-projects:
     * Interface Definition Language (IDL).
@@ -17,4 +17,10 @@ $ ../gradlew build install
 ```bash
 $ cd server
 $ ../gradle run
+```
+
+## Run tests
+
+```bash
+$ ./gradlew test
 ```
