@@ -1,6 +1,6 @@
 package es.aramirez.server.infrastructure;
 
-import es.aramirez.server.core.application.AddPanel;
+import es.aramirez.server.infrastructure.grpc.AddPanel;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
