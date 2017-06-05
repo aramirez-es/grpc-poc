@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+
+package es.aramirez.todo;
+
+message PanelRequest {
+    string name = 1;
+}
+
+message PanelResponse {
+    string name = 1;
+}
+
+service PanelResource {
+    rpc Panel (PanelRequest) returns (PanelResponse) {}
+}
