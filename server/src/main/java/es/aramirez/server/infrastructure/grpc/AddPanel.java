@@ -17,10 +17,10 @@ public class AddPanel extends PanelResourceGrpc.PanelResourceImplBase {
 
   @Override
   public void addPanel(PanelRequest request, StreamObserver<PanelResponse> responseObserver) {
-
-    AddPanelUseCase.Request addPanelRequest = new AddPanelUseCase.Request(request.getName());
-    Mono<AddPanelUseCase.Response> addPanelResponse = this.addPanelService.execute(addPanelRequest);
-
-    responseObserver.onNext(PanelResponse.newBuilder().setIndex(addPanelResponse.block().getNewPanelIndex()).build());
+    Mono.just(request)
+        .map(panelRequest -> new AddPanelUseCase.Request(panelRequest.getName()))
+        .flatMapMany(useCaseRequest -> this.addPanelService.execute(useCaseRequest))
+        .map(useCaseResponse -> PanelResponse.newBuilder().setIndex(useCaseResponse.getNewPanelIndex()).build())
+        .doOnNext(panelResponse -> responseObserver.onNext(panelResponse));
   }
 }
