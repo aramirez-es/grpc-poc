@@ -6,9 +6,9 @@ import es.aramirez.server.infrastructure.repositories.InMemoryPanelRepository;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+
 
 public class ListPanelsUseCaseTest {
   @Test
@@ -21,9 +21,9 @@ public class ListPanelsUseCaseTest {
 
     ListPanelsUseCase useCase = new ListPanelsUseCase(repository);
 
-    Mono<ListPanelsUseCase.Response> response = useCase.execute(new ListPanelsUseCase.Request());
+    Flux<ListPanelsUseCase.Response> response = useCase.execute(new ListPanelsUseCase.Request());
 
-    assertThat(response.block().getPanels().size(), CoreMatchers.is(3));
+    assertThat(response.collectList().block().size(), CoreMatchers.is(3));
 
   }
 }

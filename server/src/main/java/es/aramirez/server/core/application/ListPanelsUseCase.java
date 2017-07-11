@@ -1,10 +1,7 @@
 package es.aramirez.server.core.application;
 
 import es.aramirez.server.core.domain.PanelRepository;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
 
 public class ListPanelsUseCase {
   private PanelRepository repository;
@@ -13,31 +10,18 @@ public class ListPanelsUseCase {
     this.repository = repository;
   }
 
-  public Mono<Response> execute(Request request) {
+  public Flux<Response> execute(Request request) {
     return repository.getPanels()
-        .map(panel -> new Response.Panel(panel.getId(), panel.getName()))
-        .collect(Collectors.toList())
-        .map(Response::new);
+        .map(panel -> new Response(panel.getId(), panel.getName()));
   }
 
   public static class Request {}
 
   public static class Response {
-    private List<Panel> panels;
-
-    public Response(List<Panel> panels) {
-      this.panels = panels;
-    }
-
-    public List<Panel> getPanels() {
-      return panels;
-    }
-
-    public static class Panel {
       private String id;
       private String name;
 
-      public Panel(String id, String name) {
+      public Response(String id, String name) {
         this.id = id;
         this.name = name;
       }
@@ -50,5 +34,4 @@ public class ListPanelsUseCase {
         return name;
       }
     }
-  }
 }
