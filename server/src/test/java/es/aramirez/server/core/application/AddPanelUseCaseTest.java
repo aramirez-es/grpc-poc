@@ -1,5 +1,6 @@
 package es.aramirez.server.core.application;
 
+import es.aramirez.server.infrastructure.repositories.InMemoryPanelRepository;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 
@@ -9,21 +10,11 @@ import static org.junit.Assert.assertThat;
 public class AddPanelUseCaseTest {
   @Test
   public void itShouldAddNewPanel() throws Exception {
-    AddPanelUseCase service = new AddPanelUseCase();
+    InMemoryPanelRepository panelRepository = new InMemoryPanelRepository();
+    AddPanelUseCase service = new AddPanelUseCase(panelRepository);
 
-    Mono<AddPanelUseCase.Response> response1 = service.execute(new AddPanelUseCase.Request("New Panel"));
-    Mono<AddPanelUseCase.Response> response2 = service.execute(new AddPanelUseCase.Request("Another Panel"));
+    Mono<AddPanelUseCase.Response> response = service.execute(new AddPanelUseCase.Request("New Panel"));
 
-    assertThat(response1.block().getNewPanelIndex(), is(0));
-    assertThat(response2.block().getNewPanelIndex(), is(1));
-  }
-
-  @Test
-  public void itShouldNotAddPanelIfAlreadyExist() throws Exception {
-    AddPanelUseCase service = new AddPanelUseCase();
-    service.execute(new AddPanelUseCase.Request("New Panel"));
-    Mono<AddPanelUseCase.Response> response2 = service.execute(new AddPanelUseCase.Request("New Panel"));
-
-    assertThat(response2.block().getNewPanelIndex(), is(0));
+    assertThat(panelRepository.getById(response.block().getPanelId()).block().getName(), is("New Panel"));
   }
 }

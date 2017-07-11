@@ -1,25 +1,22 @@
 package es.aramirez.server.core.application;
 
+import es.aramirez.server.core.domain.Panel;
+import es.aramirez.server.core.domain.PanelRepository;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddPanelUseCase {
 
-  private List<String> panels = new ArrayList<>();
+  private final PanelRepository panelRepository;
+
+  public AddPanelUseCase(PanelRepository panelRepository) {
+    this.panelRepository = panelRepository;
+  }
 
   public Mono<Response> execute(Request request) {
-
-    return Mono.defer(() -> {
-      if (!panels.contains(request.getName())) {
-        panels.add(request.getName());
-      }
-
-      final int newPanelIndex = panels.indexOf(request.getName());
-
-      return Mono.just(new Response(newPanelIndex));
-    });
+    return Mono.just(new Panel(request.getName()))
+        .flatMapMany(panelRepository::addPanel)
+        .singleOrEmpty()
+        .map(Response::new);
   }
 
   public static class Request {
@@ -35,17 +32,17 @@ public class AddPanelUseCase {
     }
 
   }
-  public class Response {
+  public static class Response {
 
-    private int newPanelIndex;
+    private String panelId;
 
-    public Response(int newPanelIndex) {
+    public Response(String panelId) {
 
-      this.newPanelIndex = newPanelIndex;
+      this.panelId = panelId;
     }
 
-    public int getNewPanelIndex() {
-      return newPanelIndex;
+    public String getPanelId() {
+      return panelId;
     }
   }
 }

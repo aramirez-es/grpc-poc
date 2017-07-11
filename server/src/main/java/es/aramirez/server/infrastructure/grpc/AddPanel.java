@@ -1,6 +1,7 @@
 package es.aramirez.server.infrastructure.grpc;
 
 import es.aramirez.server.core.application.AddPanelUseCase;
+import es.aramirez.server.infrastructure.repositories.InMemoryPanelRepository;
 import es.aramirez.todo.PanelRequest;
 import es.aramirez.todo.PanelResourceGrpc;
 import es.aramirez.todo.PanelResponse;
@@ -12,15 +13,15 @@ public class AddPanel extends PanelResourceGrpc.PanelResourceImplBase {
   private final AddPanelUseCase addPanelService;
 
   public AddPanel() {
-    this.addPanelService = new AddPanelUseCase();
+    this.addPanelService = new AddPanelUseCase(new InMemoryPanelRepository());
   }
 
   @Override
   public void addPanel(PanelRequest request, StreamObserver<PanelResponse> responseObserver) {
     Mono.just(request.getName())
         .map(AddPanelUseCase.Request::new)
-        .flatMapMany(this.addPanelService::execute)
-        .map(useCaseResponse -> PanelResponse.newBuilder().setIndex(useCaseResponse.getNewPanelIndex()).build())
+        .flatMapMany(addPanelService::execute)
+        .map(useCaseResponse -> PanelResponse.newBuilder().setPanelId(useCaseResponse.getPanelId()).build())
         .doOnNext(responseObserver::onNext)
         .doOnComplete(responseObserver::onCompleted)
         .subscribe();

@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class AddPanelTest {
@@ -46,6 +46,6 @@ public class AddPanelTest {
     String newPanel = "New Panel";
     PanelResponse response = blockingStub.addPanel(PanelRequest.newBuilder().setName(newPanel).build());
 
-    assertThat(response.getIndex(), is(0));
+    assertThat(response.getPanelId(), notNullValue());
   }
 }
