@@ -12,8 +12,8 @@ public class AddPanel extends PanelResourceGrpc.PanelResourceImplBase {
 
   private final AddPanelUseCase addPanelService;
 
-  public AddPanel() {
-    this.addPanelService = new AddPanelUseCase(new InMemoryPanelRepository());
+  public AddPanel(AddPanelUseCase addPanelUseCase) {
+    this.addPanelService = addPanelUseCase;
   }
 
   @Override
