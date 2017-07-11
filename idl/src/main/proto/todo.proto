@@ -21,7 +21,15 @@ message TaskResponse {
     string taskId = 1;
 }
 
+message ListPanelsRequest {}
+
+message ListPanelsResponse {
+    string panelId = 1;
+    string title = 2;
+}
+
 service PanelResource {
     rpc AddPanel (PanelRequest) returns (PanelResponse) {}
     rpc AddTask (TaskRequest) returns (TaskResponse) {}
+    rpc ListPanels (ListPanelsRequest) returns (stream ListPanelsResponse) {}
 }
