@@ -15,5 +15,6 @@ dependencies {
     compile 'es.aramirez:idl:1.0-SNAPSHOT'
     compile 'io.projectreactor:reactor-core:3.0.7.RELEASE'
 
+    testCompile 'io.grpc:grpc-testing:1.4.0'
     testCompile 'io.projectreactor.addons:reactor-test:3.0.7.RELEASE'
 }
