@@ -1,10 +1,9 @@
 package es.aramirez.server.infrastructure.grpc;
 
-import es.aramirez.server.core.application.AddPanelUseCase;
+import es.aramirez.server.core.application.AddTaskUseCase;
+import es.aramirez.server.core.domain.Panel;
 import es.aramirez.server.infrastructure.repositories.InMemoryPanelRepository;
-import es.aramirez.todo.PanelRequest;
-import es.aramirez.todo.PanelResourceGrpc;
-import es.aramirez.todo.PanelResponse;
+import es.aramirez.todo.*;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -13,18 +12,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-public class AddPanelTest {
+public class AddTaskTest {
 
-  private static final String UNIQUE_SERVER_NAME = "in-process server for " + AddPanel.class;
+  private static final String UNIQUE_SERVER_NAME = "in-process server for " + AddTask.class;
 
   private final InMemoryPanelRepository panelRepository = new InMemoryPanelRepository();
+
   private final Server inProcessServer = InProcessServerBuilder
       .forName(UNIQUE_SERVER_NAME)
-      .addService(new AddPanel(new AddPanelUseCase(panelRepository)))
+      .addService(new AddTask(new AddTaskUseCase(panelRepository)))
       .directExecutor()
       .build();
 
@@ -45,12 +44,21 @@ public class AddPanelTest {
   }
 
   @Test
-  public void itShouldAddNewPanel() throws Exception {
-    PanelResourceGrpc.PanelResourceBlockingStub blockingStub = PanelResourceGrpc.newBlockingStub(inProcessChannel);
-    String newPanel = "New Panel";
-    PanelResponse response = blockingStub.addPanel(PanelRequest.newBuilder().setName(newPanel).build());
+  public void itShouldAddNewTask() throws Exception {
+    Panel panel = new Panel("Any panel");
+    panelRepository.addPanel(panel).block();
 
-    assertThat(response.getPanelId(), notNullValue());
-    assertThat(panelRepository.getById(response.getPanelId()).block().getName(), is(newPanel));
+    PanelResourceGrpc.PanelResourceBlockingStub blockingStub = PanelResourceGrpc.newBlockingStub(inProcessChannel);
+
+    String newTask = "Buy some cool stuff";
+    TaskResponse response = blockingStub.addTask(
+        TaskRequest
+            .newBuilder()
+            .setTitle(newTask)
+            .setPanelId(panel.getId())
+            .build()
+    );
+
+    assertThat(response.getTaskId(), notNullValue());
   }
 }

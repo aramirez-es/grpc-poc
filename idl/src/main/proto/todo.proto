@@ -9,9 +9,19 @@ message PanelRequest {
 }
 
 message PanelResponse {
-    int32 index = 1;
+    string panelId = 1;
+}
+
+message TaskRequest {
+    string panelId = 1;
+    string title = 2;
+}
+
+message TaskResponse {
+    string taskId = 1;
 }
 
 service PanelResource {
     rpc AddPanel (PanelRequest) returns (PanelResponse) {}
+    rpc AddTask (TaskRequest) returns (TaskResponse) {}
 }
