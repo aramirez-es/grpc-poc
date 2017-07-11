@@ -39,4 +39,9 @@ public class InMemoryPanelRepository implements PanelRepository {
   public Mono<String> update(Panel panel) {
     return Mono.just(panel.getId());
   }
+
+  @Override
+  public Flux<Panel> getPanels() {
+    return Flux.fromStream(panels.stream());
+  }
 }
