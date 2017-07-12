@@ -28,8 +28,24 @@ message ListPanelsResponse {
     string title = 2;
 }
 
+message GetPanelRequest {
+    string panelId = 1;
+}
+
+message GetPanelResponse {
+    string panelId = 1;
+    string title = 2;
+    repeated Task tasks = 3;
+
+    message Task {
+        string taskId = 1;
+        string title = 2;
+    }
+}
+
 service PanelResource {
     rpc AddPanel (PanelRequest) returns (PanelResponse) {}
     rpc AddTask (TaskRequest) returns (TaskResponse) {}
     rpc ListPanels (ListPanelsRequest) returns (stream ListPanelsResponse) {}
+    rpc GetPanel (stream GetPanelRequest) returns (stream GetPanelResponse) {}
 }
