@@ -69,5 +69,16 @@ public class ClientChannel {
   private static void initializeClientChannel() {
     channel = ManagedChannelBuilder.forAddress(SERVER, PORT).usePlaintext(true).build();
     asyncApi = PanelResourceGrpc.newStub(channel);
+
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      System.err.println("*** shutting down channel since JVM is shutting down");
+      if (channel != null) {
+        channel.shutdown();
+        System.err.println("*** channel shut down");
+      }
+    }));
+  }
+
+  public static void close() throws InterruptedException {
   }
 }

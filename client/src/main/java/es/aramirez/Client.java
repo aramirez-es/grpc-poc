@@ -39,6 +39,11 @@ public class Client extends Application {
     ClientChannel.init(addButton, newTask, messages);
   }
 
+  @Override
+  public void stop() throws Exception {
+    ClientChannel.close();
+  }
+
   public static void main(String[] args) throws InterruptedException {
     launch(args);
   }
