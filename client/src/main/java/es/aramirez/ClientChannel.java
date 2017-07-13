@@ -2,37 +2,72 @@ package es.aramirez;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 public class ClientChannel {
 
-  public static final String PANEL = "";
+  public static final String PANEL = "ea4c16dd-b540-4ef3-965a-f8c4aa55f7e8";
 
   public static final String SERVER = "localhost";
-  public static final int PORT = 8000;
+  public static final int PORT = 9090;
 
-  private static PanelResourceGrpc.PanelResourceStub streamingApi;
-  private static PanelResourceGrpc.PanelResourceBlockingStub blockingApi;
+  private static ManagedChannel channel;
+  private static PanelResourceGrpc.PanelResourceStub asyncApi;
 
-
-  public static void init(Button addButton) {
+  public static void init(Button addButton, TextField newTask, ObservableList<String> messages) {
     initializeClientChannel();
+
+    StreamObserver<GetPanelRequest> panelRequestStream = asyncApi.getPanel(new StreamObserver<GetPanelResponse>() {
+      @Override
+      public void onNext(GetPanelResponse value) {
+        Platform.runLater(() -> value.getTasksList().stream()
+            .map(GetPanelResponse.Task::getTitle)
+            .forEach(taskTitle -> messages.add("Task: " + taskTitle))
+        );
+      }
+
+      @Override
+      public void onError(Throwable t) {
+        t.printStackTrace();
+      }
+
+      @Override
+      public void onCompleted() {
+        System.out.println("Completed!");
+      }
+    });
+
+    panelRequestStream.onNext(GetPanelRequest.newBuilder().setPanelId(PANEL).build());
 
     addButton.setOnAction(event -> {
       Platform.runLater(() -> {
-        System.out.println("Click!");
-        TaskResponse response = blockingApi.addTask(TaskRequest.newBuilder().setPanelId(PANEL).setTitle("sasas").build());
-        System.out.println(response.getTaskId());
+        TaskRequest taskRequest = TaskRequest.newBuilder().setPanelId(PANEL).setTitle(newTask.getText()).build();
+        asyncApi.addTask(taskRequest, new StreamObserver<TaskResponse>() {
+          @Override
+          public void onNext(TaskResponse value) {
+            Platform.runLater(() -> messages.add("Task: " + value.getTaskId()));
+          }
+
+          @Override
+          public void onError(Throwable t) {
+            t.printStackTrace();
+          }
+
+          @Override
+          public void onCompleted() {
+
+          }
+        });
       });
     });
   }
 
   private static void initializeClientChannel() {
-    ManagedChannel channel = ManagedChannelBuilder.forAddress(SERVER, PORT).usePlaintext(true).build();
-
-    streamingApi = PanelResourceGrpc.newStub(channel);
-    blockingApi = PanelResourceGrpc.newBlockingStub(channel);
-
+    channel = ManagedChannelBuilder.forAddress(SERVER, PORT).usePlaintext(true).build();
+    asyncApi = PanelResourceGrpc.newStub(channel);
   }
 }

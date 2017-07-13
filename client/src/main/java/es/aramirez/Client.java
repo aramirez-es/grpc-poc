@@ -36,7 +36,7 @@ public class Client extends Application {
   @Override
   public void start(Stage primaryStage) throws Exception {
     init(primaryStage);
-    ClientChannel.init(addButton);
+    ClientChannel.init(addButton, newTask, messages);
   }
 
   public static void main(String[] args) throws InterruptedException {
