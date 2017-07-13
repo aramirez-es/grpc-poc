@@ -2,8 +2,11 @@ group 'es.aramirez'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'com.google.protobuf'
+apply plugin: 'application'
 apply plugin: 'java'
 apply plugin: 'idea'
+
+mainClassName = 'es.aramirez.Client'
 
 buildscript {
     repositories {
