@@ -43,27 +43,25 @@ public class ClientChannel {
 
     panelRequestStream.onNext(GetPanelRequest.newBuilder().setPanelId(PANEL).build());
 
-    addButton.setOnAction(event -> {
-      Platform.runLater(() -> {
-        TaskRequest taskRequest = TaskRequest.newBuilder().setPanelId(PANEL).setTitle(newTask.getText()).build();
-        asyncApi.addTask(taskRequest, new StreamObserver<TaskResponse>() {
-          @Override
-          public void onNext(TaskResponse value) {
-            Platform.runLater(() -> messages.add("Task: " + value.getTaskId()));
-          }
+    addButton.setOnAction(event -> Platform.runLater(() -> {
+      TaskRequest taskRequest = TaskRequest.newBuilder().setPanelId(PANEL).setTitle(newTask.getText()).build();
+      asyncApi.addTask(taskRequest, new StreamObserver<TaskResponse>() {
+        @Override
+        public void onNext(TaskResponse value) {
+          Platform.runLater(() -> messages.add("Task: " + value.getTaskId()));
+        }
 
-          @Override
-          public void onError(Throwable t) {
-            t.printStackTrace();
-          }
+        @Override
+        public void onError(Throwable t) {
+          t.printStackTrace();
+        }
 
-          @Override
-          public void onCompleted() {
+        @Override
+        public void onCompleted() {
 
-          }
-        });
+        }
       });
-    });
+    }));
   }
 
   private static void initializeClientChannel() {
