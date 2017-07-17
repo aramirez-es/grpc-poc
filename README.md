@@ -1,22 +1,21 @@
 ## GRPC Proof of Concept
 
 1. Gradle Multi project with following sub-projects:
-    * Interface Definition Language (IDL).
-    * Server application.
+    * Server application + Interface Definition Language (IDL).
     * Client application.
-
-## Build and Install Interface Definition Language
-
-```bash
-$ cd idl
-$ ../gradlew build install
-```
 
 ## Run the server
 
 ```bash
 $ cd server
-$ ../gradle run
+$ ../gradlew run
+```
+
+## Run the client
+
+```bash
+$ cd client
+$ ../gradlew run
 ```
 
 ## Run tests

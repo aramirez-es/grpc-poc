@@ -1,5 +1,5 @@
 rootProject.name = 'grpc'
 
-include 'idl'
 include 'server'
+include 'client'
 
