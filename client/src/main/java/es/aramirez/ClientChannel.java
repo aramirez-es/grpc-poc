@@ -27,8 +27,7 @@ class ClientChannel {
     createPanelButton.apply(null).onCreatePanelButtonClick((String newPanel) -> asyncApi.addPanel(PanelRequest.newBuilder().setName(newPanel).build(), new StreamObserver<PanelResponse>() {
       @Override
       public void onNext(PanelResponse value) {
-        Client.CreatedPanel createdPanel = panelCreator.apply(new Client.PanelDetails(value.getPanelId(), newPanel));
-        createdPanel.onAddTaskButtonClick(addNewTaskButton(createdPanel));
+        createPanelWithHandler(value.getPanelId(), newPanel, panelCreator);
       }
 
       @Override
@@ -42,6 +41,16 @@ class ClientChannel {
         System.out.println("Create panel completed!");
       }
     }));
+  }
+
+  private static void createPanelWithHandler(
+      String panelId,
+      String panelTitle,
+      Function<Client.PanelDetails, Client.CreatedPanel> panelCreator
+  ) {
+    Client.CreatedPanel createdPanel = panelCreator.apply(new Client.PanelDetails(panelId, panelTitle));
+    createGetPanelStream(createdPanel).onNext(GetPanelRequest.newBuilder().setPanelId(panelId).build());
+    createdPanel.onAddTaskButtonClick(addNewTaskButton(createdPanel));
   }
 
   private static void initializeClientChannel() {
@@ -61,11 +70,7 @@ class ClientChannel {
     asyncApi.listPanels(ListPanelsRequest.getDefaultInstance(), new StreamObserver<ListPanelsResponse>() {
       @Override
       public void onNext(ListPanelsResponse value) {
-          String panelId = value.getPanelId();
-          String panelTitle = value.getTitle();
-          Client.CreatedPanel createdPanel = panelCreator.apply(new Client.PanelDetails(panelId, panelTitle));
-          createGetPanelStream(createdPanel).onNext(GetPanelRequest.newBuilder().setPanelId(panelId).build());
-          createdPanel.onAddTaskButtonClick(addNewTaskButton(createdPanel));
+        createPanelWithHandler(value.getPanelId(), value.getTitle(), panelCreator);
       }
 
       @Override
