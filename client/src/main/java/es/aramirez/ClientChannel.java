@@ -14,9 +14,34 @@ class ClientChannel {
   private static ManagedChannel channel;
   private static PanelResourceGrpc.PanelResourceStub asyncApi;
 
-  static void init(Function<Client.PanelDetails, Client.CreatedPanel> panelCreator) {
+  static void init(
+      Function<Void, Client.CreatedPanelButton> createPanelButton,
+      Function<Client.PanelDetails, Client.CreatedPanel> panelCreator
+  ) {
     initializeClientChannel();
+    createNewPanelForm(createPanelButton, panelCreator);
     listPanels(panelCreator);
+  }
+
+  private static void createNewPanelForm(Function<Void, Client.CreatedPanelButton> createPanelButton, Function<Client.PanelDetails, Client.CreatedPanel> panelCreator) {
+    createPanelButton.apply(null).onCreatePanelButtonClick((String newPanel) -> asyncApi.addPanel(PanelRequest.newBuilder().setName(newPanel).build(), new StreamObserver<PanelResponse>() {
+      @Override
+      public void onNext(PanelResponse value) {
+        Client.CreatedPanel createdPanel = panelCreator.apply(new Client.PanelDetails(value.getPanelId(), newPanel));
+        createdPanel.onAddTaskButtonClick(addNewTaskButton(createdPanel));
+      }
+
+      @Override
+      public void onError(Throwable t) {
+        t.printStackTrace();
+        System.exit(-1);
+      }
+
+      @Override
+      public void onCompleted() {
+        System.out.println("Create panel completed!");
+      }
+    }));
   }
 
   private static void initializeClientChannel() {
@@ -32,9 +57,7 @@ class ClientChannel {
     }));
   }
 
-  private static void listPanels(
-      Function<Client.PanelDetails, Client.CreatedPanel> panelCreator
-  ) {
+  private static void listPanels(Function<Client.PanelDetails, Client.CreatedPanel> panelCreator) {
     asyncApi.listPanels(ListPanelsRequest.getDefaultInstance(), new StreamObserver<ListPanelsResponse>() {
       @Override
       public void onNext(ListPanelsResponse value) {

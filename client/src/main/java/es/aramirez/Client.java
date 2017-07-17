@@ -23,7 +23,33 @@ public class Client extends Application {
 
   private BorderPane root;
 
+  public static void main(String[] args) throws InterruptedException {
+    launch(args);
+  }
+
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    init(primaryStage);
+    ClientChannel.init(createNewPanelFormWrapper(), createNewPanelWrapper());
+  }
+
+  @Override
+  public void stop() throws Exception {
+    ClientChannel.close();
+  }
+
   public void init(Stage stage) throws Exception {
+    root = new BorderPane();
+    root.setLeft(new EmptyPane());
+    root.setRight(new EmptyPane());
+
+    stage.setTitle("TODO-List");
+    stage.setScene(new Scene(root, 1024, 768));
+
+    stage.show();
+  }
+
+  private CreatedPanelButton createNewPanelForm() {
     BorderPane addNewPanel = new BorderPane();
     TextField addNewPanelName = new TextField(NEW_PANEL_TEXT);
     Button addNewPanelButton = new Button("Add");
@@ -31,14 +57,9 @@ public class Client extends Application {
     addNewPanel.setRight(addNewPanelButton);
     addNewPanel.setPadding(new Insets(30, 10, 0, 0));
 
-    root = new BorderPane();
-    root.setLeft(new EmptyPane());
     root.setRight(addNewPanel);
 
-    stage.setTitle("TODO-List");
-    stage.setScene(new Scene(root, 1024, 768));
-
-    stage.show();
+    return new CreatedPanelButton(addNewPanelButton, addNewPanelName);
   }
 
   private CreatedPanel createNewPanel(String panelId, String panelTitle) {
@@ -69,27 +90,33 @@ public class Client extends Application {
     return new CreatedPanel(panelId, messages, newTask, addButton);
   }
 
-  @Override
-  public void start(Stage primaryStage) throws Exception {
-    init(primaryStage);
-    ClientChannel.init(createNewPanelWrapper());
-  }
-
-  @Override
-  public void stop() throws Exception {
-    ClientChannel.close();
-  }
-
   private void updateView(BorderPane newPanel) {
     root.setLeft(((DynamicPanel) root.getLeft()).addPane(newPanel));
   }
 
-  public static void main(String[] args) throws InterruptedException {
-    launch(args);
-  }
-
   private Function<PanelDetails, CreatedPanel> createNewPanelWrapper() {
     return (PanelDetails panelDetails) -> createNewPanel(panelDetails.getPanelId(), panelDetails.getPanelTitle());
+  }
+
+  private Function<Void, CreatedPanelButton> createNewPanelFormWrapper() {
+    return (Void) -> createNewPanelForm();
+  }
+
+  public static class CreatedPanelButton {
+    private Button addPanelButton;
+    private TextField newPanel;
+
+    public CreatedPanelButton(Button addPanelButton, TextField newPanel) {
+      this.addPanelButton = addPanelButton;
+      this.newPanel = newPanel;
+    }
+
+    public void onCreatePanelButtonClick(Consumer<String> stringConsumer) {
+      addPanelButton.setOnAction(event -> Platform.runLater(() -> {
+        stringConsumer.accept(newPanel.getText());
+        newPanel.setText(NEW_PANEL_TEXT);
+      }));
+    }
   }
 
   public static class PanelDetails {
