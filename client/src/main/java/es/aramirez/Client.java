@@ -18,12 +18,17 @@ import java.util.function.Function;
 
 public class Client extends Application {
 
+  private static final String NEW_PANEL_TEXT = "New panel";
+  private static final String NEW_TASK_TEXT = "New task to do";
+
   private BorderPane root;
 
   public void init(Stage stage) throws Exception {
     BorderPane addNewPanel = new BorderPane();
-    addNewPanel.setLeft(new TextField("New panel"));
-    addNewPanel.setRight(new Button("Add"));
+    TextField addNewPanelName = new TextField(NEW_PANEL_TEXT);
+    Button addNewPanelButton = new Button("Add");
+    addNewPanel.setLeft(addNewPanelName);
+    addNewPanel.setRight(addNewPanelButton);
     addNewPanel.setPadding(new Insets(30, 10, 0, 0));
 
     root = new BorderPane();
@@ -38,7 +43,7 @@ public class Client extends Application {
 
   private CreatedPanel createNewPanel(String panelId, String panelTitle) {
     ObservableList<String> messages = FXCollections.observableArrayList();
-    TextField newTask = new TextField("New task to do");
+    TextField newTask = new TextField(NEW_TASK_TEXT);
     Button addButton = new Button("Add");
 
     Platform.runLater(() -> {
@@ -124,7 +129,10 @@ public class Client extends Application {
     }
 
     public void onAddTaskButtonClick(Consumer<String> stringConsumer) {
-      addButton.setOnAction(event -> Platform.runLater(() -> stringConsumer.accept(newTask.getText())));
+      addButton.setOnAction(event -> Platform.runLater(() -> {
+        stringConsumer.accept(newTask.getText());
+        newTask.setText(NEW_TASK_TEXT);
+      }));
     }
 
     public String getPanelId() {
