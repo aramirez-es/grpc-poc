@@ -35,7 +35,7 @@ public class PanelResource extends PanelResourceGrpc.PanelResourceImplBase {
     Mono.just(request)
         .map(listPanelsRequest -> new ListPanelsUseCase.Request())
         .flatMapMany(listPanelsUseCase::execute)
-        .map(response -> ListPanelsResponse.getDefaultInstance())
+        .map(response -> ListPanelsResponse.newBuilder().setPanelId(response.getId()).setTitle(response.getName()).build())
         .doOnNext(responseObserver::onNext)
         .doOnComplete(responseObserver::onCompleted)
         .subscribe();

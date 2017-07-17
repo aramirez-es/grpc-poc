@@ -8,14 +8,14 @@
 
 ```bash
 $ cd server
-$ ../gradle run
+$ ../gradlew run
 ```
 
 ## Run the client
 
 ```bash
 $ cd client
-$ ../gradle run
+$ ../gradlew run
 ```
 
 ## Run tests

@@ -14,12 +14,23 @@ import java.io.IOException;
 public class Server {
   public static void main(String[] args) throws IOException, InterruptedException {
 
-    Panel panel = new Panel("Montly");
-    panel.addTask("Go to the super!");
-    System.out.println("Panel ID: " + panel.getId());
+    Panel panelMonthly = new Panel("Monthly");
+    Panel panelWeekly = new Panel("Weekly");
+    Panel panelDaily = new Panel("Daily");
+    panelMonthly.addTask("Go to the super!");
+    panelWeekly.addTask("Clean he house");
+    panelWeekly.addTask("Go to the super");
+    panelDaily.addTask("Walking the dog");
+    panelDaily.addTask("Hit the gym");
+    panelDaily.addTask("Go work");
+    System.out.println("Panel ID: " + panelMonthly.getId());
+    System.out.println("Panel ID: " + panelWeekly.getId());
+    System.out.println("Panel ID: " + panelDaily.getId());
 
     InMemoryPanelRepository panelRepository = new InMemoryPanelRepository();
-    panelRepository.addPanel(panel).block();
+    panelRepository.addPanel(panelMonthly).block();
+    panelRepository.addPanel(panelWeekly).block();
+    panelRepository.addPanel(panelDaily).block();
 
     PanelResource panelResourceService = new PanelResource(
         new ListPanelsUseCase(panelRepository),
